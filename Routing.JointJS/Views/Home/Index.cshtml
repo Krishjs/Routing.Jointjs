@@ -1,0 +1,128 @@
+﻿<style type="text/css">
+    #paper {
+        border: 1px solid;
+    }
+</style>
+<div id="paper">
+
+</div>
+<script type="text/javascript">
+    var graph = new joint.dia.Graph;
+    var paper = new joint.dia.Paper({
+        el: $('#paper'),
+        width: 800,
+        height: 800,
+        gridSize: 1,
+        model: graph,
+        interactive: function (cellView) {
+            if (cellView.model instanceof joint.dia.Link) {
+                return { vertexAdd: false };
+            }
+            return true;
+        }
+    });
+
+    function RoutingSet(p) {
+        var me = this;
+        this.Position = function () {
+            return {
+                Service: {
+                    x: p.x,
+                    y: p.y
+                },
+                OpenWire: {
+                    Service: {
+                        x: p.x - 60,
+                        y: p.y + 8
+                    },
+                    Port: {
+                        x: p.x + 360,
+                        y: p.y + 98
+                    }
+                },
+                Port: {
+                    x: p.x + 150,
+                    y: p.y + 90
+                },
+                Connector: {
+                    x: p.x + 60,
+                    y: p.y + 98
+                }
+            }
+        }();
+        this.Dimension = {
+            Rect: {
+                x: 140,
+                y: 36
+            },
+            Circle: {
+                x: 20,
+                y: 20
+            }
+        };
+        this.Service = new joint.shapes.basic.TextBlock({
+            position: { x: me.Position.Service.x, y: me.Position.Service.y },
+            size: { width: me.Dimension.Rect.x, height: me.Dimension.Rect.y },
+            attrs: { rect: { fill: 'white' } },
+            content: '<p><span style="color:#999999;">Service 1 </span><span style="color:#FF3366;">Broken</span></p><span>Condor</span>'
+        });
+        this.OpenWireService = new joint.shapes.basic.Circle({
+            position: { x: me.Position.OpenWire.Service.x, y: me.Position.OpenWire.Service.y },
+            size: { width: me.Dimension.Circle.x, height: me.Dimension.Circle.y },
+            attrs: {
+                rect: { fill: 'white' },
+                text: { text: '+', font_size: 'large', fill: 'black' }
+            }
+        });
+        this.OpenWirePort = new joint.shapes.basic.Circle({
+            name: 'OpenWirePort',
+            position: { x: me.Position.OpenWire.Port.x, y: me.Position.OpenWire.Port.y },
+            size: { width: me.Dimension.Circle.x, height: me.Dimension.Circle.y },
+            attrs: {
+                rect: { fill: 'white' },
+                text: { text: '+', font_size: 'large', fill: 'black' },
+                '.openWirePort': {  }
+            }
+        });
+        this.Connector = new joint.shapes.basic.Circle({
+            name: 'Connector',
+            position: { x: me.Position.Connector.x, y: me.Position.Connector.y },
+            size: { width: me.Dimension.Circle.x, height: me.Dimension.Circle.y },
+            attrs: { rect: { fill: 'white' }, text: { text: '+', font_size: 'large', fill: 'black' } }
+        });
+        this.Port = new joint.shapes.basic.TextBlock({
+            position: { x: me.Position.Port.x, y: me.Position.Port.y },
+            size: { width: me.Dimension.Rect.x, height: me.Dimension.Rect.y },
+            attrs: { rect: { fill: 'white' } },
+            content: '<p><span style="color:#999999;">TP 1 </span><span style="color:#FF3366;">Broken</span></p><span>Salah</span>'
+        });
+        this.OTS = new joint.dia.Link({
+            source: { id: me.OpenWireService.id },
+            target: { id: me.Service.id }
+        });
+        this.PTO = new joint.dia.Link({
+            source: { id: me.Port.id },
+            target: { id: me.OpenWirePort.id }
+        });
+        this.STP = new joint.dia.Link({
+            source: { id: me.Service.id },
+            target: { id: me.Connector.id }
+        });
+        this.CTP = new joint.dia.Link({
+            source: { id: me.Connector.id },
+            target: { id: me.Port.id }
+        });
+        this.Render = function () {
+            graph.addCells([me.Service, me.Port, me.Connector, me.OpenWireService, me.OTS, me.OpenWirePort, me.PTO, me.STP, me.CTP]);
+        };
+    }
+
+    paper.on('cell:pointerdown', function (cl, evt, x, y) {
+        debugger;
+    });
+
+    var wg1 = new RoutingSet({ x: 100, y: 30 });
+    var wg2 = new RoutingSet({ x: 450, y: 30 });
+    wg1.Render();
+    //wg2.Render();
+</script>
